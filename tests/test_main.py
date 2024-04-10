@@ -14,9 +14,9 @@ def test_read_main():
 def test_classify_endpoint():
     client.__enter__()
 
-    message = "I hate black women, they so stupid"
+    message = "Love this beautiful country"
     response = client.get(f"/classify/{message}")
     assert response.status_code == 200
-    assert response.json() == {"sentiment": "negative"}
+    assert response.json() == {"sentiment": "positive"}
 
     client.__exit__(None, None, None)
