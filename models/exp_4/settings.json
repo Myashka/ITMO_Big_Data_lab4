@@ -1,0 +1,1 @@
+{"n_estimators": 5, "max_depth": 10, "id2label": {"0": "negative", "1": "positive"}}

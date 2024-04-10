@@ -1,0 +1,26 @@
+[tool.poetry]
+name = "src"
+version = "0.1.0"
+description = "Template for MLE project"
+authors = ["Alexey <porsh-5@yandex.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pandas = "^2.2.1"
+scikit-learn = "^1.4.1.post1"
+pydantic = "^2.6.4"
+textblob = "^0.18.0.post0"
+pyyaml = "^6.0.1"
+loguru = "^0.7.2"
+pytest = "^8.1.1"
+fastapi = "^0.110.1"
+requests = "^2.31.0"
+uvicorn = "^0.29.0"
+configparser = "^6.0.1"
+httpx = "^0.27.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

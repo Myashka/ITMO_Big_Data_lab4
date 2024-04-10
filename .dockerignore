@@ -1,0 +1,6 @@
+.dvc
+*.dvc
+data
+notebooks
+.git
+.gitignore

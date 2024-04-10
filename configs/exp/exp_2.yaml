@@ -1,0 +1,18 @@
+exp_name: "Experiment_2"
+log_path: "./logs"
+save_path: "./models/exp_2"
+
+train_x_csv_path: "data/processed/x_train.csv"
+train_y_csv_path: "data/processed/y_train.csv"
+test_x_csv_path: "data/processed/x_test.csv"
+test_y_csv_path: "data/processed/y_test.csv"
+
+preprocessing_config:
+  use_normalization: true
+  use_lemmatization: false
+classifier_config:
+  n_estimators: 100
+  max_depth: 20
+  id2label:
+    0: negative
+    1: positive

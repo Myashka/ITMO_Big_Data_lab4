@@ -1,0 +1,37 @@
+name: CD
+
+on:
+  workflow_dispatch:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main, dev]
+    types:
+      - completed
+
+jobs:
+  pytest:
+    env:
+      MEMORY_LIMIT_MB: 4096
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        lfs: true
+
+    - name: Pull Docker image
+      run: docker pull myashka/big_data_app:latest
+
+    - name: Run Docker container (without starting FastAPI)
+      run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
+
+    - name: Execute tests inside Docker container
+      run: docker exec big_data_container poetry run pytest src/unit_tests/
+
+    - name: Execute integration tests inside Docker container
+      run: docker exec big_data_container poetry run pytest tests/
+
+    - name: Stop and remove Docker container
+      if: always()
+      run: |
+        docker stop big_data_container
+        docker rm big_data_container
