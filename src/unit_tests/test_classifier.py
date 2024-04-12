@@ -1,6 +1,4 @@
 import pytest
-from sklearn.datasets import fetch_20newsgroups
-from sklearn.model_selection import train_test_split
 
 from src.classifier import Classifier
 from src.settings.classifier import ClassifierSettings
