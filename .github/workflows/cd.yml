@@ -14,6 +14,8 @@ jobs:
       MEMORY_LIMIT_MB: 4096
     runs-on: ubuntu-latest
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
 
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
