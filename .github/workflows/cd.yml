@@ -18,8 +18,11 @@ jobs:
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
 
-    - name: Run Docker container (without starting FastAPI)
-      run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
+    - name: Start services
+      run: docker-compose up -d
+
+    # - name: Run Docker container (without starting FastAPI)
+    #   run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
 
     - name: Execute tests inside Docker container
       run: docker exec big_data_container poetry run pytest src/unit_tests/
@@ -27,8 +30,6 @@ jobs:
     - name: Execute integration tests inside Docker container
       run: docker exec big_data_container poetry run pytest tests/
 
-    - name: Stop and remove Docker container
+    - name: Stop services
       if: always()
-      run: |
-        docker stop big_data_container
-        docker rm big_data_container
+      run: docker-compose down
