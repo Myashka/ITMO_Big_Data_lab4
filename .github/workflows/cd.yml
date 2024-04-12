@@ -10,6 +10,17 @@ on:
 
 jobs:
   pytest:
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: my_database
+          POSTGRES_USER: my_user
+          POSTGRES_PASSWORD: my_password
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     env:
       MEMORY_LIMIT_MB: 4096
     runs-on: ubuntu-latest
@@ -20,11 +31,8 @@ jobs:
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
 
-    - name: Start services
-      run: docker-compose up -d
-
-    # - name: Run Docker container (without starting FastAPI)
-    #   run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
+    - name: Run Docker container (without starting FastAPI)
+      run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
 
     - name: Execute tests inside Docker container
       run: docker exec big_data_container poetry run pytest src/unit_tests/
