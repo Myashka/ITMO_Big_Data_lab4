@@ -25,11 +25,11 @@ async def test_read_results(client):
 
 @pytest.mark.asyncio
 async def test_classify_input(client):
-    # client.__enter__()
+    client.__enter__()
 
     message = "Love this beautiful country"
     response = await client.post(f"/classify/{message}")
     assert response.status_code == 200
     assert response.json() == {"sentiment": "positive"}
 
-    # client.__exit__(None, None, None)
+    client.__exit__(None, None, None)
