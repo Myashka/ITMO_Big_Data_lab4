@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from src.classifier import Classifier
-from src.db import crud, models
+from src.db import models
 from src.db.database import engine, get_db
 from src.db.models import Result
 from src.preprocessor import Preprocessor
