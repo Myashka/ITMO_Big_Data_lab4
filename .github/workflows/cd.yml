@@ -34,7 +34,7 @@ jobs:
     #   run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
 
     - name: Execute unit tests inside Docker container
-      run: docker exec -T app poetry run pytest src/unit_tests/
+      run: docker exec itmo_big_data_lab2_app_1 poetry run pytest src/unit_tests/
 
     # - name: Execute integration tests inside Docker container
       # run: docker exec big_data_container poetry run pytest tests/
