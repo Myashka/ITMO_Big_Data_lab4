@@ -12,11 +12,7 @@ jobs:
   pytest:
     env:
       MEMORY_LIMIT_MB: 4096
-      DB_NAME: test_db
-      DB_USER: test_user
-      DB_PASSWORD: 123321
-      DATABASE_URL: "postgresql+asyncpg://test_user:123321@db:5432/test_db"
-      
+
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -24,8 +20,21 @@ jobs:
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
 
+    - name: Create .env file
+      run: |
+        echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
+
+
     - name: Start services
       run: docker-compose up -d
+      # env:
+      #   DB_NAME: test_db
+      #   DB_USER: test_user
+      #   DB_PASSWORD: 123321
+      #   DATABASE_URL: "postgresql+asyncpg://test_user:123321@db:5432/test_db"
 
     # - name: Run Docker container (without starting FastAPI)
     #   run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
