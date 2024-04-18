@@ -47,4 +47,4 @@ async def test_classify_input(client):
     assert results[0]['sentiment'] == sentiment
 
 
-    # client.__exit__(None, None, None)
+    # app.__exit__(None, None, None)

@@ -22,18 +22,21 @@ from src.utils import load_config
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    config: AppConfig = load_config()
+
+    assert os.path.isdir(config.load_path), "There is no model dir"
+
+    app.state.preprocessor_settings = PreprocessorSettings(
+        **config.preprocessing_config.dict()
+    )
+    app.state.preprocessor = Preprocessor(settings=app.state.preprocessor_settings)
+    app.state.classifier = Classifier.load(config.load_path)
 
     async with engine.begin() as conn:
         await conn.run_sync(models.Base.metadata.create_all)
 
     yield
 
-config: AppConfig = load_config()
-assert os.path.isdir(config.load_path), "There is no model dir"
-
-preprocessor_settings = PreprocessorSettings(**config.preprocessing_config.dict())
-preprocessor = Preprocessor(settings=preprocessor_settings)
-classifier = Classifier.load(config.load_path)
 
 app = FastAPI(lifespan=lifespan)
 
@@ -55,8 +58,8 @@ async def read_results(db: AsyncSession = Depends(get_db)):
 @app.post("/classify/{message}", status_code=200, response_model=PredictOutput)
 async def classify_input(message: str, db: AsyncSession = Depends(get_db)):
     try:
-        processed_test: str = preprocessor(message)
-        pred: PredictOutput = classifier.predict(processed_test)
+        processed_test: str = app.state.preprocessor(message)
+        pred: PredictOutput = app.state.classifier.predict(processed_test)
         result = models.Result(message=message, sentiment=pred.sentiment)
         db.add(result)
         await db.commit()
