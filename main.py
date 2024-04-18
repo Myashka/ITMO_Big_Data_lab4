@@ -65,6 +65,7 @@ async def classify_input(message: str, db: AsyncSession = Depends(get_db)):
         await db.commit()
         return pred
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=500, detail=str(e))
 
 
