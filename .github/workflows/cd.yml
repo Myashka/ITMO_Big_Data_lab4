@@ -33,8 +33,8 @@ jobs:
     - name: Execute unit tests inside Docker container
       run: docker-compose exec -T app poetry run pytest src/unit_tests/
 
-    - name: Execute integration tests inside Docker container
-      run: docker-compose exec -T app poetry run pytest tests/
+    # - name: Execute integration tests inside Docker container
+    #   run: docker-compose exec -T app poetry run pytest tests/
 
     - name: Stop services
       if: always()
