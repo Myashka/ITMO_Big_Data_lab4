@@ -6,10 +6,9 @@ from main import app
 
 @pytest.fixture(scope="module")
 def test_app():
-    # Вызываем событие старта перед тестами
     with TestClient(app) as client:
         app.router.startup()
-        yield client  # Здесь тесты выполняются
+        yield client
         app.router.shutdown()
             
 def test_read_main(test_app):

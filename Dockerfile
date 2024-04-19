@@ -31,5 +31,4 @@ EXPOSE 8001
 
 ENV PYTHONPATH "${PYTHONPATH}:/app"
 
-# CMD ["tail", "-f", "/dev/null"]
 CMD ["poetry", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001"]
