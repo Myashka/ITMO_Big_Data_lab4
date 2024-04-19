@@ -11,7 +11,7 @@ on:
 jobs:
   test:
     env:
-      MEMORY_LIMIT_MB: 4096
+      MEMORY_LIMIT_MB: 8192
 
     runs-on: self-hosted
     steps:
@@ -34,7 +34,12 @@ jobs:
       run: docker-compose exec -T app poetry run pytest src/unit_tests/
 
     - name: Execute integration tests inside Docker container
-      run: docker-compose exec -T app poetry run pytest tests/
+      run: docker-compose exec -T app poetry run pytest --log-cli-level=DEBUG tests/
+      # run: docker-compose exec -T app poetry run pytest tests/
+
+    - name: Get Docker Compose Logs
+      if: always()
+      run: docker-compose logs
 
     - name: Stop services
       if: always()
