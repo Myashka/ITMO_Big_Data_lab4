@@ -13,7 +13,7 @@ jobs:
     env:
       MEMORY_LIMIT_MB: 4096
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v4
 
