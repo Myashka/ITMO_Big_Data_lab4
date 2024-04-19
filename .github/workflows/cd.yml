@@ -9,13 +9,16 @@ on:
       - completed
 
 jobs:
-  pytest:
+  tests:
     env:
       MEMORY_LIMIT_MB: 4096
 
     runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
@@ -33,8 +36,8 @@ jobs:
     - name: Execute unit tests inside Docker container
       run: docker-compose exec -T app poetry run pytest src/unit_tests/
 
-    # - name: Execute integration tests inside Docker container
-    #   run: docker-compose exec -T app poetry run pytest tests/
+    - name: Execute integration tests inside Docker container
+      run: docker-compose exec -T app poetry run pytest tests/
 
     - name: Stop services
       if: always()
