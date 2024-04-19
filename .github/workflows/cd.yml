@@ -9,29 +9,38 @@ on:
       - completed
 
 jobs:
-  pytest:
+  test:
     env:
       MEMORY_LIMIT_MB: 4096
+
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
-      with:
-        lfs: true
 
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
 
-    - name: Run Docker container (without starting FastAPI)
-      run: docker run -d --name big_data_container myashka/big_data_app:latest tail -f /dev/null
+    - name: Create .env file
+      run: |
+        echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
+        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
+        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
 
-    - name: Execute tests inside Docker container
-      run: docker exec big_data_container poetry run pytest src/unit_tests/
+    - name: Start services
+      run: docker-compose up -d
+
+    - name: Execute unit tests inside Docker container
+      run: docker-compose exec -T app poetry run pytest src/unit_tests/
 
     - name: Execute integration tests inside Docker container
-      run: docker exec big_data_container poetry run pytest tests/
+      run: docker-compose exec -T app poetry run pytest --log-cli-level=DEBUG tests/
+      # run: docker-compose exec -T app poetry run pytest tests/
 
-    - name: Stop and remove Docker container
+    - name: Get Docker Compose Logs
       if: always()
-      run: |
-        docker stop big_data_container
-        docker rm big_data_container
+      run: docker-compose logs
+
+    - name: Stop services
+      if: always()
+      run: docker-compose down
