@@ -9,16 +9,13 @@ on:
       - completed
 
 jobs:
-  tests:
+  test:
     env:
       MEMORY_LIMIT_MB: 4096
 
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
     - uses: actions/checkout@v4
-      with:
-        ref: ${{ github.event.workflow_run.head_branch }}
 
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
