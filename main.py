@@ -17,7 +17,7 @@ from src.settings.db import DBResult
 from src.settings.preprocessor import PreprocessorSettings
 from src.utils import load_config
 
-load_dotenv()
+# load_dotenv()
 
 
 app = FastAPI()
