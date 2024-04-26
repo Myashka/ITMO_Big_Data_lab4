@@ -9,8 +9,8 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - db
-    env_file:
-      - .env
+    # env_file:
+    #   - dynamic.env
   db:
     image: postgres:15
     environment:

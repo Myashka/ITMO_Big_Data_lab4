@@ -20,15 +20,13 @@ jobs:
     - name: Pull Docker image
       run: docker pull myashka/big_data_app:latest
 
-    - name: Create .env file
-      run: |
-        echo "DB_NAME=${{ secrets.DB_NAME }}" >> .env
-        echo "DB_USER=${{ secrets.DB_USER }}" >> .env
-        echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" >> .env
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-
     - name: Start services
-      run: docker-compose up -d
+      run: |
+        DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+        DB_NAME="${{ secrets.DB_NAME }}" \
+        DB_USER="${{ secrets.DB_USER }}" \
+        DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+        docker-compose up -d
 
     - name: Execute unit tests inside Docker container
       run: docker-compose exec -T app poetry run pytest src/unit_tests/

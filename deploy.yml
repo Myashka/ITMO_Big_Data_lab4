@@ -1,0 +1,29 @@
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Decrypt Ansible Vault
+      ansible.builtin.include_vars:
+        file: secrets.yml
+        name: secrets
+
+    - name: Set database URL
+      set_fact:
+        database_url: "postgresql://{{ secrets.db_user }}:{{ secrets.db_password }}@{{ secrets.db_hostname }}:{{ secrets.db_port }}/{{ secrets.db_name }}"
+
+    - name: Run Docker Compose
+      shell: |
+        DATABASE_URL="{{ database_url }}" \
+        DB_NAME="{{ secrets.db_name }}" \
+        DB_USER="{{ secrets.db_user }}" \
+        DB_PASSWORD="{{ secrets.db_password }}" \
+        docker-compose up -d
+        
+    # - name: Create dynamic.env file for Docker
+    #   copy:
+    #     dest: "./dynamic.env"
+    #     content: |
+    #       DB_NAME={{ secrets.db_name }}
+    #       DB_USER={{ secrets.db_user }}
+    #       DB_PASSWORD={{ secrets.db_password }}
+    #       DATABASE_URL={{ database_url }}
