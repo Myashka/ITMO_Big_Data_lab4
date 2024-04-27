@@ -1,35 +1,38 @@
+import json
 import os
 from typing import List
 
-from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException
+from fastapi import Depends, FastAPI
+from kafka import KafkaProducer
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
-from src.classifier import Classifier
-from src.db import models
+# from src.classifier import Classifier
+# from src.db import models
 from src.db.database import Database
 from src.db.models import Result
-from src.preprocessor import Preprocessor
-from src.settings.classifier import PredictOutput
-from src.settings.config import AppConfig
+# from src.preprocessor import Preprocessor
+# from src.settings.classifier import PredictOutput
+# from src.settings.config import AppConfig
 from src.settings.db import DBResult
-from src.settings.preprocessor import PreprocessorSettings
-from src.utils import load_config
+# from src.settings.preprocessor import PreprocessorSettings
+# from src.utils import load_config
 
 # load_dotenv()
 
 
 app = FastAPI()
 db = Database(os.getenv("DATABASE_URL"))
+producer = KafkaProducer(bootstrap_servers='kafka:9092',
+                         value_serializer=lambda v: json.dumps(v).encode('utf-8'))
 
 @app.on_event("startup")
 def startup_event():
-    config: AppConfig = load_config()
-    assert os.path.isdir(config.load_path), "There is no model dir"
-    app.state.preprocessor_settings = PreprocessorSettings(**config.preprocessing_config.dict())
-    app.state.preprocessor = Preprocessor(settings=app.state.preprocessor_settings)
-    app.state.classifier = Classifier.load(config.load_path)
+    # config: AppConfig = load_config()
+    # assert os.path.isdir(config.load_path), "There is no model dir"
+    # app.state.preprocessor_settings = PreprocessorSettings(**config.preprocessing_config.dict())
+    # app.state.preprocessor = Preprocessor(settings=app.state.preprocessor_settings)
+    # app.state.classifier = Classifier.load(config.load_path)
     
     db.create_tables()
 
@@ -46,18 +49,10 @@ def read_results(db_session: Session = Depends(db.get_db)):
     return results
 
 
-@app.post("/classify/{message}", status_code=200, response_model=PredictOutput)
-def classify_input(message: str, db_session: Session = Depends(db.get_db)):
-    try:
-        processed_test: str = app.state.preprocessor(message)
-        pred: PredictOutput = app.state.classifier.predict(processed_test)
-        result = models.Result(message=message, sentiment=pred.sentiment)
-        db_session.add(result)
-        db_session.commit()
-        return pred
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail=str(e))
+@app.post("/classify/{message}", status_code=200)
+def classify_input(message: str):
+    producer.send('classify-topic', value={'message': message})
+    return {"status": "Message sent to Kafka"}
 
 if __name__ == "__main__":
     import uvicorn

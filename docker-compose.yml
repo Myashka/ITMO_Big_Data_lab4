@@ -1,5 +1,28 @@
 version: '3.10'
 services:
+  zookeeper:
+    image: bitnami/zookeeper:3.9
+    ports:
+      - "2181:2181"
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    volumes:
+      - zookeeper_data:/bitnami
+
+  kafka:
+    image: bitnami/kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092,EXTERNAL://:9094
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+    depends_on:
+      - zookeeper
+    volumes:
+      - kafka_data:/bitnami
+  
   app:
     build: .
     ports:
@@ -9,8 +32,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
     depends_on:
       - db
-    # env_file:
-    #   - dynamic.env
+      - kafka
   db:
     image: postgres:15
     environment:
@@ -22,5 +44,20 @@ services:
     ports:
       - "5432:5432"
 
+  kafka_consumer:
+    build: .
+    command: ["poetry", "run", "python", "consumer.py"]
+    restart: unless-stopped
+    depends_on:
+      - kafka
+      - db
+      - app
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+
 volumes:
   postgres_data:
+  zookeeper_data:
+    driver: local
+  kafka_data:
+    driver: local
