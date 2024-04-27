@@ -25,7 +25,7 @@ def test_requests(test_app):
     assert response.status_code == 200
     assert response.json() == {"status": "Message sent to Kafka"}
 
-    time.sleep(3)
+    time.sleep(5)
 
     # Получаем все результаты
     response = test_app.get("/results")
@@ -42,7 +42,7 @@ def test_requests(test_app):
     assert response.status_code == 200
     result_data = response.json()
     assert result_data['message'] == message
-    assert 'sentiment' in result_data  # Проверяем, что поле sentiment существует
+    assert 'sentiment' in result_data
 
 
 # def test_requests(test_app):

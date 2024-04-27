@@ -27,6 +27,9 @@ jobs:
         DB_USER="${{ secrets.DB_USER }}" \
         DB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
         docker-compose up -d
+        
+    - name: Wait for services to be ready
+      run: sleep 30
 
     - name: Execute unit tests inside Docker container
       run: docker-compose exec -T app poetry run pytest src/unit_tests/
