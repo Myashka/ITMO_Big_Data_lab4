@@ -20,10 +20,11 @@ classifier = Classifier.load(config.load_path)
 
 # Инициализация базы данных
 db = Database(os.getenv("DATABASE_URL"))
+topic_name = os.getenv("KAFKA_TOPIC_NAME", "classify-topic")
 
 # Kafka консьюмер
 consumer = KafkaConsumer(
-    'classify-topic',
+    topic_name,
     bootstrap_servers='kafka:9092',
     auto_offset_reset='earliest',
     value_deserializer=lambda x: json.loads(x.decode('utf-8'))
