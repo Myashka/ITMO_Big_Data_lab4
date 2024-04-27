@@ -1,9 +1,11 @@
-from kafka import KafkaConsumer
 import json
 import os
-from src.db.database import Database
-from src.db import models
+
+from kafka import KafkaConsumer
+
 from src.classifier import Classifier
+from src.db import models
+from src.db.database import Database
 from src.preprocessor import Preprocessor
 from src.settings.config import AppConfig
 from src.settings.preprocessor import PreprocessorSettings

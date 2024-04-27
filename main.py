@@ -2,19 +2,17 @@ import json
 import os
 from typing import List
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from kafka import KafkaProducer
 from sqlalchemy.future import select
 from sqlalchemy.orm import Session
 
-# from src.classifier import Classifier
-# from src.db import models
 from src.db.database import Database
 from src.db.models import Result
-# from src.preprocessor import Preprocessor
-# from src.settings.classifier import PredictOutput
+from src.settings.classifier import PredictOutput
 # from src.settings.config import AppConfig
 from src.settings.db import DBResult
+
 # from src.settings.preprocessor import PreprocessorSettings
 # from src.utils import load_config
 
@@ -40,6 +38,12 @@ def startup_event():
 def index():
     return {"index": "classification app working"}
 
+@app.get("/results/{message_id}", response_model=DBResult)
+def get_classification_result(message_id: int, db_session: Session = Depends(db.get_db)):
+    result = db_session.query(Result).filter(Result.id == message_id).first()
+    if result is not None:
+        return result
+    raise HTTPException(status_code=404, detail="Result not found")
 
 @app.get("/results", status_code=200, response_model=List[DBResult])
 def read_results(db_session: Session = Depends(db.get_db)):
