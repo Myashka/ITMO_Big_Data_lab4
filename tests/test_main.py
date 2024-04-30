@@ -18,6 +18,7 @@ def test_read_main(test_app):
 
 import time
 
+
 def test_requests(test_app):
     message = "Love this beautiful country"
     # Отправляем сообщение на классификацию
@@ -33,30 +34,12 @@ def test_requests(test_app):
     results = response.json()
     assert len(results) > 0
 
-    # Проверяем, что последнее сообщение соответствует отправленному
     last_result = results[-1]
     assert last_result['message'] == message
 
-    # Получаем результат по ID
     response = test_app.get(f"/results/{last_result['id']}")
     assert response.status_code == 200
     result_data = response.json()
     assert result_data['message'] == message
     assert 'sentiment' in result_data
 
-
-# def test_requests(test_app):
-#     message = "Love this beautiful country"
-#     response =  test_app.post(f"/classify/{message}")
-#     assert response.status_code == 200
-#     result_data =  response.json()
-
-#     assert 'sentiment' in result_data   
-#     sentiment = result_data['sentiment']
-
-#     response =  test_app.get("/results")
-#     assert response.status_code == 200
-#     results = response.json()
-#     assert len(results) == 1
-#     assert results[0]['message'] == message
-#     assert results[0]['sentiment'] == sentiment

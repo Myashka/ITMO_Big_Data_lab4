@@ -48,7 +48,7 @@ services:
 
   kafka_consumer:
     build: .
-    command: ["poetry", "run", "python", "consumer.py"]
+    command: ["poetry", "run", "python", "src/kafka/consumer.py"]
     restart: unless-stopped
     depends_on:
       - kafka
