@@ -1,5 +1,7 @@
 from sqlalchemy import Column, DateTime, Integer, String, func
+
 from src.db.database import Database
+
 
 class Result(Database.Base):
     __tablename__ = "results"

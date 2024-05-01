@@ -16,18 +16,30 @@ def test_read_main(test_app):
     assert response.status_code == 200
     assert response.json() == {"index": "classification app working"}
 
+import time
+
+
 def test_requests(test_app):
     message = "Love this beautiful country"
-    response =  test_app.post(f"/classify/{message}")
+    # Отправляем сообщение на классификацию
+    response = test_app.post(f"/classify/{message}")
     assert response.status_code == 200
-    result_data =  response.json()
+    assert response.json() == {"status": "Message sent to Kafka"}
 
-    assert 'sentiment' in result_data   
-    sentiment = result_data['sentiment']
+    time.sleep(5)
 
-    response =  test_app.get("/results")
+    # Получаем все результаты
+    response = test_app.get("/results")
     assert response.status_code == 200
     results = response.json()
-    assert len(results) == 1
-    assert results[0]['message'] == message
-    assert results[0]['sentiment'] == sentiment
+    assert len(results) > 0
+
+    last_result = results[-1]
+    assert last_result['message'] == message
+
+    response = test_app.get(f"/results/{last_result['id']}")
+    assert response.status_code == 200
+    result_data = response.json()
+    assert result_data['message'] == message
+    assert 'sentiment' in result_data
+
